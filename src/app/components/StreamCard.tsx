@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Eye } from "lucide-react";
 
 export interface StreamCardData {
   id: string;
@@ -14,22 +15,22 @@ export function StreamCard({ stream }: { stream: StreamCardData }) {
   const id = stream.streamerId || stream.id;
   return (
     <Link to={`/stream/${id}`} className="block group">
-      <div className="relative aspect-video bg-secondary rounded-md overflow-hidden">
+      <div className="relative aspect-video bg-card rounded overflow-hidden border-2 border-transparent group-hover:border-primary group-hover:-translate-y-0.5 transition-all duration-150">
         {stream.thumbnailUrl ? (
           <img
             src={stream.thumbnailUrl}
             alt={stream.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+            className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/30 to-secondary" />
+          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-card" />
         )}
-        <span className="absolute top-2 left-2 bg-accent text-accent-foreground text-xs font-bold px-2 py-0.5 rounded uppercase">
+        <span className="absolute top-2 left-2 bg-destructive text-white text-[11px] font-bold px-1.5 py-0.5 rounded-sm uppercase tracking-wide">
           Live
         </span>
         {stream.viewerCount != null && (
-          <span className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded">
-            {stream.viewerCount.toLocaleString()} viewers
+          <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+            <Eye className="w-3 h-3" /> {stream.viewerCount.toLocaleString()}
           </span>
         )}
       </div>

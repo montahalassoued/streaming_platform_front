@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss" source(none);
 @source "../src";
 @import "tw-animate-css";
@@ -62,40 +63,40 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Kick-like dark theme */
-  --background: oklch(0.16 0 0);                /* #0f0f0f */
-  --foreground: oklch(1 0 0);                   /* white */
-  --card: oklch(0.21 0 0);                      /* #1a1a1a */
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.21 0 0);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.62 0.16 290);              /* #7F77DD purple */
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.26 0 0);                 /* #242424 */
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.26 0 0);
-  --muted-foreground: oklch(0.7 0 0);           /* #a0a0a0 */
-  --accent: oklch(0.62 0.13 160);               /* #1D9E75 green */
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.6 0.22 25);
+  --radius: 0.375rem;
+  /* Kick.com-inspired dark theme */
+  --background: oklch(0.15 0.005 280);          /* #0e0e10 */
+  --foreground: oklch(0.96 0.003 280);          /* #efeff1 */
+  --card: oklch(0.22 0.005 280);                /* #1f1f23 */
+  --card-foreground: oklch(0.96 0.003 280);
+  --popover: oklch(0.25 0.008 280);             /* #26262c */
+  --popover-foreground: oklch(0.96 0.003 280);
+  --primary: oklch(0.88 0.27 138);              /* #53fc18 Kick green */
+  --primary-foreground: oklch(0 0 0);           /* black on green */
+  --secondary: oklch(0.28 0.01 280);            /* #2d2d35 */
+  --secondary-foreground: oklch(0.96 0.003 280);
+  --muted: oklch(0.28 0.01 280);
+  --muted-foreground: oklch(0.74 0.008 280);    /* #adadb8 */
+  --accent: oklch(0.88 0.27 138);
+  --accent-foreground: oklch(0 0 0);
+  --destructive: oklch(0.55 0.23 28);           /* #eb0400 live red */
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.3 0 0);
-  --input: oklch(0.26 0 0);
-  --ring: oklch(0.62 0.16 290);
+  --border: oklch(0.28 0.01 280);               /* subtle */
+  --input: oklch(0.28 0.01 280);
+  --ring: oklch(0.88 0.27 138);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.26 0 0);
-  --sidebar-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.62 0.16 290);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.3 0 0);
-  --sidebar-accent-foreground: oklch(1 0 0);
-  --sidebar-border: oklch(0.3 0 0);
-  --sidebar-ring: oklch(0.62 0.16 290);
+  --sidebar: oklch(0.15 0.005 280);
+  --sidebar-foreground: oklch(0.96 0.003 280);
+  --sidebar-primary: oklch(0.88 0.27 138);
+  --sidebar-primary-foreground: oklch(0 0 0);
+  --sidebar-accent: oklch(0.22 0.005 280);
+  --sidebar-accent-foreground: oklch(0.96 0.003 280);
+  --sidebar-border: oklch(0.28 0.01 280);
+  --sidebar-ring: oklch(0.88 0.27 138);
 }
 
 .dark {
@@ -141,5 +142,37 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.01em;
   }
 }
+
+@keyframes live-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(83, 252, 24, 0.5); }
+  70%  { box-shadow: 0 0 0 10px rgba(83, 252, 24, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(83, 252, 24, 0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.live-pulse {
+  animation: live-pulse 2s infinite;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #1f1f23 25%, #2d2d35 50%, #1f1f23 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Hide scrollbar but allow scroll */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
