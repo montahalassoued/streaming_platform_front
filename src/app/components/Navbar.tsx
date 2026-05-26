@@ -39,19 +39,19 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-border bg-card flex items-center px-4 gap-4">
-      <Link to="/" className="flex items-center gap-2 font-bold text-lg">
+    <header className="sticky top-0 z-40 h-14 border-b border-border bg-background flex items-center px-4 gap-4">
+      <Link to="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
         <Tv className="w-6 h-6 text-primary" />
         <span className="text-primary">StreamX</span>
       </Link>
-      <form onSubmit={onSearch} className="flex-1 max-w-md mx-auto hidden md:block">
+      <form onSubmit={onSearch} className="flex-1 max-w-[380px] mx-auto hidden md:block">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search streamers..."
-            className="pl-9 bg-secondary border-none"
+            placeholder="Search"
+            className="pl-9 h-9 bg-secondary border-border focus-visible:ring-primary focus-visible:border-primary"
           />
         </div>
       </form>
@@ -126,8 +126,19 @@ export function Navbar() {
           </>
         ) : (
           <>
-            <Button variant="ghost" onClick={() => navigate("/login")}>Login</Button>
-            <Button onClick={() => navigate("/register")}>Register</Button>
+            <Button
+              variant="outline"
+              className="h-9 border-border bg-transparent hover:bg-secondary"
+              onClick={() => navigate("/login")}
+            >
+              Sign In
+            </Button>
+            <Button
+              className="h-9 bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+              onClick={() => navigate("/register")}
+            >
+              Sign Up
+            </Button>
           </>
         )}
       </div>
