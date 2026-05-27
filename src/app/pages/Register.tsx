@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { Tv } from "lucide-react";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ username: "", email: "", password: "", displayName: "" });
+  const [form, setForm] = useState({ username: "", email: "", password: ""});
   const navigate = useNavigate();
 
   const mut = useMutation({
@@ -33,16 +33,15 @@ export default function RegisterPage() {
         </div>
         <h1 className="text-xl font-semibold mb-6 text-center">Create account</h1>
         <form
-          onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            mut.mutate();
+          }}
           className="space-y-4"
         >
           <div className="space-y-1.5">
             <Label>Username</Label>
             <Input value={form.username} onChange={upd("username")} required />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Display name</Label>
-            <Input value={form.displayName} onChange={upd("displayName")} required />
           </div>
           <div className="space-y-1.5">
             <Label>Email</Label>
@@ -57,7 +56,10 @@ export default function RegisterPage() {
           </Button>
         </form>
         <p className="text-sm text-muted-foreground text-center mt-4">
-          Already have an account? <Link to="/login" className="text-primary hover:underline">Log in</Link>
+          Already have an account?{" "}
+          <Link to="/login" className="text-primary hover:underline">
+            Log in
+          </Link>
         </p>
       </div>
     </div>

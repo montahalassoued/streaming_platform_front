@@ -7,12 +7,15 @@ export interface StreamCardData {
   title: string;
   thumbnailUrl?: string;
   viewerCount?: number;
-  category?: string;
+  category?: string | { name?: string };
   streamer?: { username: string; avatarUrl?: string; displayName?: string };
 }
 
 export function StreamCard({ stream }: { stream: StreamCardData }) {
   const id = stream.streamerId || stream.id;
+  const categoryLabel =
+    typeof stream.category === "string" ? stream.category : (stream.category?.name ?? "");
+
   return (
     <Link to={`/stream/${id}`} className="block group">
       <div className="relative aspect-video bg-card rounded overflow-hidden border-2 border-transparent group-hover:border-primary group-hover:-translate-y-0.5 transition-all duration-150">
@@ -45,7 +48,7 @@ export function StreamCard({ stream }: { stream: StreamCardData }) {
           <p className="text-xs text-muted-foreground truncate">
             {stream.streamer?.displayName ?? stream.streamer?.username}
           </p>
-          {stream.category && <p className="text-xs text-muted-foreground">{stream.category}</p>}
+          {categoryLabel && <p className="text-xs text-muted-foreground">{categoryLabel}</p>}
         </div>
       </div>
     </Link>

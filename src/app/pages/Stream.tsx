@@ -49,6 +49,8 @@ export default function StreamPage() {
 
   const streamId = stream?.id ?? streamerId;
   const viewers = liveViewers ?? stream?.viewerCount ?? 0;
+  const categoryLabel =
+    typeof stream?.category === "string" ? stream.category : (stream?.category?.name ?? "");
 
   return (
     <div className="flex flex-col lg:flex-row min-h-[calc(100vh-3.5rem)]">
@@ -68,7 +70,7 @@ export default function StreamPage() {
             <>
               <h1 className="text-xl font-bold">{stream.title}</h1>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                {stream.category && <span>{stream.category}</span>}
+                {categoryLabel && <span>{categoryLabel}</span>}
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4" /> {viewers.toLocaleString()} viewers
                 </span>

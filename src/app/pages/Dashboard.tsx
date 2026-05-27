@@ -14,7 +14,11 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const qc = useQueryClient();
   const [showKey, setShowKey] = useState(false);
-  const [stats, setStats] = useState<{ viewerCount?: number; peakViewers?: number; totalDonations?: number }>({});
+  const [stats, setStats] = useState<{
+    viewerCount?: number;
+    peakViewers?: number;
+    totalDonations?: number;
+  }>({});
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
 
@@ -29,7 +33,11 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (keyData?.title) setTitle(keyData.title);
-    if (keyData?.category) setCategory(keyData.category);
+    if (keyData?.category) {
+      const categoryValue =
+        typeof keyData.category === "string" ? keyData.category : (keyData.category?.name ?? "");
+      setCategory(categoryValue);
+    }
     if (keyData?.viewerCount != null) setStats((s) => ({ ...s, viewerCount: keyData.viewerCount }));
   }, [keyData]);
 
@@ -47,7 +55,9 @@ export default function DashboardPage() {
         } catch {}
       };
     } catch {}
-    return () => { es?.close(); };
+    return () => {
+      es?.close();
+    };
   }, [streamId]);
 
   const updateMut = useMutation({
