@@ -5,6 +5,8 @@ import { connectNotificationSSE, disconnectNotificationSSE } from "@/app/lib/sse
 import { Layout } from "@/app/components/Layout";
 import { ProtectedRoute } from "@/app/components/ProtectedRoute";
 import HomePage from "@/app/pages/Home";
+import BrowsePage from "@/app/pages/Browse";
+import FollowingPage from "@/app/pages/Following";
 import LoginPage from "@/app/pages/Login";
 import RegisterPage from "@/app/pages/Register";
 import StreamPage from "@/app/pages/Stream";
@@ -31,6 +33,8 @@ export default function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<Layout withSidebar />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/browse" element={<BrowsePage />} />
+          <Route path="/following" element={<FollowingPage />} />
         </Route>
         <Route element={<Layout />}>
           <Route path="/stream/:streamerId" element={<StreamPage />} />

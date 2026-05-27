@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Search, Tv, User, LogOut, LayoutDashboard } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { Bell, Search, User, LogOut, LayoutDashboard, Menu } from "lucide-react";
+import { useState } from "react";
 import { useAuthStore } from "@/app/stores/auth";
 import { useNotificationStore } from "@/app/stores/notifications";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,13 @@ import {
 import { disconnectChatSocket } from "@/app/lib/socket";
 import { disconnectNotificationSSE } from "@/app/lib/sse";
 
-export function Navbar() {
+export function Navbar({
+  onToggleSidebar,
+  showSidebarToggle = false,
+}: {
+  onToggleSidebar?: () => void;
+  showSidebarToggle?: boolean;
+}) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { notifications, unreadCount, markAllRead } = useNotificationStore();
   const navigate = useNavigate();
@@ -39,19 +45,31 @@ export function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 h-14 border-b border-border bg-background flex items-center px-4 gap-4">
-      <Link to="/" className="flex items-center gap-2 font-bold text-xl tracking-tight">
-        <Tv className="w-6 h-6 text-primary" />
-        <span className="text-primary">StreamX</span>
+    <header className="sticky top-0 z-50 h-16 border-b border-border bg-background flex items-center px-4 gap-4">
+      {showSidebarToggle && (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="hover:bg-gray-800"
+          onClick={onToggleSidebar}
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="w-5 h-5" />
+        </Button>
+      )}
+      <Link to="/" className="flex items-center gap-2 font-black text-xl tracking-tighter uppercase italic">
+        <span className="bg-primary text-black px-2 py-0.5 rounded-sm">StreamX</span>
+        <span className="text-[10px] align-top ml-0.5 font-bold">BETA</span>
       </Link>
-      <form onSubmit={onSearch} className="flex-1 max-w-[380px] mx-auto hidden md:block">
+      <form onSubmit={onSearch} className="flex-1 max-w-2xl mx-auto hidden md:block">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search"
-            className="pl-9 h-9 bg-secondary border-border focus-visible:ring-primary focus-visible:border-primary"
+            className="pl-9 h-10 bg-[#1a1c1e] border-none focus-visible:ring-primary focus-visible:border-primary"
           />
         </div>
       </form>
@@ -60,7 +78,7 @@ export function Navbar() {
           <>
             <Popover onOpenChange={(o) => o && markAllRead()}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
+                <Button variant="ghost" size="icon" className="relative hover:bg-gray-800">
                   <Bell className="w-5 h-5" />
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 bg-primary text-primary-foreground text-[10px] rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
@@ -98,7 +116,7 @@ export function Navbar() {
             </Popover>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="rounded-full">
+                <Button variant="ghost" size="icon" className="rounded-full hover:bg-gray-800">
                   {user?.avatarUrl ? (
                     <img src={user.avatarUrl} alt="" className="w-8 h-8 rounded-full" />
                   ) : (
@@ -127,14 +145,14 @@ export function Navbar() {
         ) : (
           <>
             <Button
-              variant="outline"
-              className="h-9 border-border bg-transparent hover:bg-secondary"
+              variant="ghost"
+              className="h-9 text-sm font-semibold hover:text-primary"
               onClick={() => navigate("/login")}
             >
-              Sign In
+              Log In
             </Button>
             <Button
-              className="h-9 bg-primary text-primary-foreground font-semibold hover:bg-primary/90"
+              className="h-9 bg-primary text-black text-sm font-bold hover:opacity-90"
               onClick={() => navigate("/register")}
             >
               Sign Up
