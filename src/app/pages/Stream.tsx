@@ -1,24 +1,25 @@
-import { useParams } from "react-router-dom";
-import { useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
+import { DollarSign, Eye, Heart } from "lucide-react";
 import { streamsApi, followsApi } from "@/app/lib/services";
-import { VideoPlayer } from "@/app/components/VideoPlayer";
-import { Chat } from "@/app/components/Chat";
-import { DonateModal } from "@/app/components/DonateModal";
-import { SubscribeModal } from "@/app/components/SubscribeModal";
+import { useAuthStore } from "@/app/stores/auth";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Eye, Heart, Star, DollarSign } from "lucide-react";
-import { useAuthStore } from "@/app/stores/auth";
+import { VideoPlayer } from "@/app/components/VideoPlayer";
+import { ChatOverlay } from "@/app/components/ChatOverlay";
+import { DonationPopup } from "@/app/components/DonationPopup";
+import { DonationModal } from "@/app/components/DonationModal";
+import { SubscribeButton } from "@/app/components/SubscribeButton";
+import { StreamerNotifications } from "@/app/components/StreamerNotifications";
+import { StreamerStatsPanel } from "@/app/components/StreamerStatsPanel";
 import { toast } from "sonner";
 
 export default function StreamPage() {
   const { streamerId = "" } = useParams();
-  const { isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthStore();
   const qc = useQueryClient();
-  const [liveViewers, setLiveViewers] = useState<number | null>(null);
   const [donateOpen, setDonateOpen] = useState(false);
-  const [subOpen, setSubOpen] = useState(false);
 
   const { data: stream, isLoading } = useQuery({
     queryKey: ["stream", streamerId],
@@ -34,6 +35,10 @@ export default function StreamPage() {
   });
 
   const isFollowing = !!followStatus?.following;
+  const isOwner = useMemo(
+    () => Boolean(user?.id && stream?.streamer?.id && user.id === stream.streamer.id),
+    [stream?.streamer?.id, user?.id],
+  );
 
   const followMut = useMutation({
     mutationFn: () =>
@@ -45,83 +50,114 @@ export default function StreamPage() {
     onError: (e: any) => toast.error(e?.response?.data?.message ?? "Action failed"),
   });
 
-  const onViewerCount = useCallback((n: number) => setLiveViewers(n), []);
-
   const streamId = stream?.id ?? streamerId;
-  const viewers = liveViewers ?? stream?.viewerCount ?? 0;
+  const viewers = Number(stream?.viewerCount ?? 0);
   const categoryLabel =
     typeof stream?.category === "string" ? stream.category : (stream?.category?.name ?? "");
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-[calc(100vh-3.5rem)]">
-      <div className="flex-1 min-w-0">
-        {isLoading ? (
-          <Skeleton className="aspect-video w-full" />
-        ) : (
-          <VideoPlayer src={stream?.hlsUrl} />
-        )}
-        <div className="p-4 space-y-3">
+    <div className="min-h-[calc(100vh-3.5rem)] bg-background">
+      {streamId && stream?.streamer?.id && isOwner && (
+        <StreamerNotifications streamerId={stream.streamer.id} />
+      )}
+
+      <div className="mx-auto grid min-h-[calc(100vh-3.5rem)] max-w-7xl gap-6 p-4 lg:grid-cols-[minmax(0,1fr)_22rem] xl:grid-cols-[minmax(0,1fr)_26rem]">
+        <div className="min-w-0 space-y-4">
           {isLoading ? (
-            <>
-              <Skeleton className="h-6 w-2/3" />
-              <Skeleton className="h-4 w-1/3" />
-            </>
-          ) : stream ? (
-            <>
-              <h1 className="text-xl font-bold">{stream.title}</h1>
-              <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                {categoryLabel && <span>{categoryLabel}</span>}
-                <span className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" /> {viewers.toLocaleString()} viewers
-                </span>
-              </div>
-              <div className="flex items-center gap-3 pt-3 border-t border-border">
-                {stream.streamer?.avatarUrl ? (
-                  <img src={stream.streamer.avatarUrl} className="w-12 h-12 rounded-full" alt="" />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-primary" />
-                )}
-                <div className="flex-1">
-                  <p className="font-semibold">
-                    {stream.streamer?.displayName ?? stream.streamer?.username}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {stream.streamer?.followerCount ?? 0} followers
-                  </p>
-                </div>
-                {isAuthenticated && (
-                  <div className="flex gap-2">
-                    <Button
-                      variant={isFollowing ? "secondary" : "default"}
-                      onClick={() => followMut.mutate()}
-                      disabled={followMut.isPending}
-                    >
-                      <Heart className="w-4 h-4 mr-2" />
-                      {isFollowing ? "Unfollow" : "Follow"}
-                    </Button>
-                    <Button variant="secondary" onClick={() => setSubOpen(true)}>
-                      <Star className="w-4 h-4 mr-2" /> Subscribe
-                    </Button>
-                    <Button variant="secondary" onClick={() => setDonateOpen(true)}>
-                      <DollarSign className="w-4 h-4 mr-2" /> Donate
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </>
+            <Skeleton className="aspect-video w-full rounded-2xl" />
           ) : (
-            <p className="text-muted-foreground">Stream not found.</p>
+            <VideoPlayer src={stream?.hlsUrl} />
+          )}
+
+          <div className="rounded-2xl border border-border bg-card/95 p-4 shadow-xl backdrop-blur">
+            {isLoading ? (
+              <>
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="mt-3 h-4 w-1/3" />
+              </>
+            ) : stream ? (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="space-y-2">
+                    <h1 className="text-2xl font-bold tracking-tight">{stream.title}</h1>
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                      {categoryLabel && <span>{categoryLabel}</span>}
+                      <span className="flex items-center gap-1.5">
+                        <Eye className="h-4 w-4" /> {viewers.toLocaleString()} viewers
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {isAuthenticated && !isOwner && (
+                      <Button
+                        variant={isFollowing ? "secondary" : "default"}
+                        onClick={() => followMut.mutate()}
+                        disabled={followMut.isPending}
+                      >
+                        <Heart className="mr-2 h-4 w-4" />
+                        {isFollowing ? "Unfollow" : "Follow"}
+                      </Button>
+                    )}
+                    {!isOwner && isAuthenticated && <SubscribeButton streamerId={streamId} />}
+                    {!isOwner && isAuthenticated && (
+                      <Button variant="secondary" onClick={() => setDonateOpen(true)}>
+                        <DollarSign className="mr-2 h-4 w-4" /> Donate
+                      </Button>
+                    )}
+                    {!isAuthenticated && (
+                      <p className="text-sm text-muted-foreground">
+                        Log in to follow, subscribe, or donate.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
+                  {stream.streamer?.avatarUrl ? (
+                    <img
+                      src={stream.streamer.avatarUrl}
+                      className="h-12 w-12 rounded-full object-cover"
+                      alt=""
+                    />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-primary" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">
+                      {stream.streamer?.displayName ?? stream.streamer?.username}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {stream.streamer?.followerCount ?? 0} followers
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <p className="text-muted-foreground">Stream not found.</p>
+            )}
+          </div>
+
+          {streamId && stream?.streamer?.id && isOwner && (
+            <StreamerStatsPanel streamId={streamId} />
+          )}
+        </div>
+
+        <div className="min-h-[32rem] lg:h-[calc(100vh-5.5rem)]">
+          {streamId ? (
+            <ChatOverlay streamId={streamId} className="h-full" />
+          ) : (
+            <div className="flex h-full items-center justify-center rounded-2xl border border-border bg-card/70 p-6 text-center text-sm text-muted-foreground">
+              Chat is unavailable until a stream loads.
+            </div>
           )}
         </div>
       </div>
-      <div className="w-full lg:w-80 xl:w-96 h-[60vh] lg:h-[calc(100vh-3.5rem)] shrink-0">
-        {streamId && <Chat streamId={streamId} onViewerCount={onViewerCount} />}
-      </div>
-      {streamId && (
-        <>
-          <DonateModal streamerId={streamerId} open={donateOpen} onOpenChange={setDonateOpen} />
-          <SubscribeModal streamerId={streamerId} open={subOpen} onOpenChange={setSubOpen} />
-        </>
+
+      {streamId && stream?.streamer?.id && <DonationPopup streamerId={stream.streamer.id} />}
+
+      {streamId && stream?.streamer?.id && (
+        <DonationModal streamerId={stream.streamer.id} open={donateOpen} onOpenChange={setDonateOpen} />
       )}
     </div>
   );

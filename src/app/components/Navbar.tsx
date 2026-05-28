@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Bell, Search, User, LogOut, LayoutDashboard, Menu } from "lucide-react";
+import { Bell, Search, User, LogOut, LayoutDashboard, Menu, Radio } from "lucide-react";
 import { useState } from "react";
 import { useAuthStore } from "@/app/stores/auth";
 import { useNotificationStore } from "@/app/stores/notifications";
@@ -76,6 +76,16 @@ export function Navbar({
       <div className="ml-auto flex items-center gap-2">
         {isAuthenticated ? (
           <>
+            {user?.isStreamer && (
+              <Button
+                variant="secondary"
+                className="h-9 gap-2 text-sm font-semibold"
+                onClick={() => navigate("/dashboard/streamer/live", { state: { autoStart: true } })}
+              >
+                <Radio className="w-4 h-4" />
+                Go Live
+              </Button>
+            )}
             <Popover onOpenChange={(o) => o && markAllRead()}>
               <PopoverTrigger asChild>
                 <Button variant="ghost" size="icon" className="relative hover:bg-gray-800">

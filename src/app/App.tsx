@@ -12,6 +12,7 @@ import RegisterPage from "@/app/pages/Register";
 import StreamPage from "@/app/pages/Stream";
 import ProfilePage from "@/app/pages/Profile";
 import DashboardPage from "@/app/pages/Dashboard";
+import GoLivePage from "@/app/pages/GoLivePage";
 
 export default function App() {
   const { hydrate, isAuthenticated } = useAuthStore();
@@ -47,7 +48,18 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<div className="p-6 text-muted-foreground">Page not found.</div>} />
+          <Route
+            path="/dashboard/streamer/live"
+            element={
+              <ProtectedRoute requireStreamer>
+                <GoLivePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="*"
+            element={<div className="p-6 text-muted-foreground">Page not found.</div>}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

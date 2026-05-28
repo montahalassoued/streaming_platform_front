@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { categoriesApi, streamsApi } from "@/app/lib/services";
+import { api } from "@/app/lib/api";
 import { StreamCard } from "@/app/components/StreamCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Gamepad2, Music, Palette, MessageSquare, Trophy } from "lucide-react";
@@ -256,8 +257,84 @@ export default function HomePage() {
           ))}
         </div>
       )}
+
+      {/* Recent VODs */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold">Recent VODs</h2>
+            <p className="text-sm text-muted-foreground">Watch recent broadcasts</p>
+          </div>
+        </div>
+
+        <RecentVods />
+      </div>
     </div>
   );
+}
+
+function RecentVods() {
+  const { data, isLoading } = useQuery({
+    queryKey: ["recent-vods"],
+    queryFn: async () => {
+      const r = await api.get("/vods");
+      return Array.isArray(r.data) ? r.data : r.data?.items ?? r.data?.data ?? [];
+    },
+    retry: false,
+  });
+
+  const vods = Array.isArray(data) ? data : [];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <div key={i}>
+            <Skeleton className="aspect-video w-full rounded-lg" />
+            <Skeleton className="h-4 w-3/4 mt-2" />
+            <Skeleton className="h-3 w-1/2 mt-1" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (!vods.length) {
+    return <p className="text-muted-foreground">No recent VODs available.</p>;
+  }
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {vods.map((v: any) => (
+        <button
+          key={v.id}
+          onClick={() => (window.location.href = `/vod/${v.id}`)}
+          className="text-left rounded-lg overflow-hidden border border-border bg-card hover:shadow-lg"
+        >
+          <div className="aspect-video bg-secondary">
+            <img src={v.thumbnailUrl ?? v.preview ?? "https://placehold.co/640x360"} className="w-full h-full object-cover" alt={v.title} />
+          </div>
+          <div className="p-3">
+            <p className="text-sm font-semibold truncate">{v.title}</p>
+            <p className="text-xs text-muted-foreground mt-1">{v.streamer?.username ?? v.streamer?.displayName}</p>
+            <p className="text-xs text-muted-foreground">{formatDuration(v.durationSeconds)}</p>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function formatDuration(sec: number | undefined) {
+  if (!sec) return "0s";
+  const s = Number(sec);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const parts = [] as string[];
+  if (h) parts.push(`${h}h`);
+  if (m) parts.push(`${m}m`);
+  if (!h && !m) parts.push(`${s}s`);
+  return parts.join(" ");
 }
 
 function CategoryIcon({ name }: { name: string }) {
