@@ -130,26 +130,6 @@ export default function LoginPage() {
           </Button>
         </form>
 
-        <div className="mt-5 rounded-lg border border-border bg-muted/20 p-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Streamer demo</p>
-          <div className="mt-3 grid gap-2">
-            {STREAMER_DEMOS.map((demo) => (
-              <button
-                key={demo.username}
-                type="button"
-                onClick={() => quickFill(demo.username)}
-                className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-left text-sm hover:bg-muted/40"
-              >
-                <span className="font-medium">{demo.label}</span>
-                <span className="text-xs text-muted-foreground">{demo.username}</span>
-              </button>
-            ))}
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            These seeded accounts already have streamer profiles in the database.
-          </p>
-        </div>
-
         <p className="text-sm text-muted-foreground text-center mt-4">
           No account?{" "}
           <Link to="/register" className="text-primary hover:underline">
